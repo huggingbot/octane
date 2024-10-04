@@ -1,14 +1,14 @@
-import { Transaction, Connection, Keypair } from '@solana/web3.js';
-import type { Cache } from 'cache-manager';
-import base58 from 'bs58';
+import { Connection, Keypair, Transaction } from '@solana/web3.js'
+import base58 from 'bs58'
+import { SimpleCache } from 'core/cache'
 import {
-    sha256,
-    simulateRawTransaction,
-    validateTransaction,
-    validateTransfer,
-    TokenFee,
-    validateInstructions,
-} from '../core';
+  sha256,
+  simulateRawTransaction,
+  TokenFee,
+  validateInstructions,
+  validateTransaction,
+  validateTransfer,
+} from '../core'
 
 /**
  * Sign transaction by fee payer if the first instruction is a transfer of token fee to given account
@@ -25,49 +25,49 @@ import {
  * @return {signature: string} Transaction signature by fee payer
  */
 export async function signWithTokenFee(
-    connection: Connection,
-    transaction: Transaction,
-    feePayer: Keypair,
-    maxSignatures: number,
-    lamportsPerSignature: number,
-    allowedTokens: TokenFee[],
-    cache: Cache,
-    sameSourceTimeout = 5000
+  connection: Connection,
+  transaction: Transaction,
+  feePayer: Keypair,
+  maxSignatures: number,
+  lamportsPerSignature: number,
+  allowedTokens: TokenFee[],
+  cache: SimpleCache,
+  sameSourceTimeout = 5000
 ): Promise<{ signature: string }> {
-    // Prevent simple duplicate transactions using a hash of the message
-    let key = `transaction/${base58.encode(sha256(transaction.serializeMessage()))}`;
-    if (await cache.get(key)) throw new Error('duplicate transaction');
-    await cache.set(key, true);
+  // Prevent simple duplicate transactions using a hash of the message
+  let key = `transaction/${base58.encode(sha256(transaction.serializeMessage()))}`
+  if (await cache.get(key)) throw new Error('duplicate transaction')
+  await cache.set(key, true)
 
-    // Check that the transaction is basically valid, sign it, and serialize it, verifying the signatures
-    const { signature, rawTransaction } = await validateTransaction(
-        connection,
-        transaction,
-        feePayer,
-        maxSignatures,
-        lamportsPerSignature
-    );
+  // Check that the transaction is basically valid, sign it, and serialize it, verifying the signatures
+  const { signature, rawTransaction } = await validateTransaction(
+    connection,
+    transaction,
+    feePayer,
+    maxSignatures,
+    lamportsPerSignature
+  )
 
-    await validateInstructions(transaction, feePayer);
+  await validateInstructions(transaction, feePayer)
 
-    // Check that the transaction contains a valid transfer to Octane's token account
-    const transfer = await validateTransfer(connection, transaction, allowedTokens);
+  // Check that the transaction contains a valid transfer to Octane's token account
+  const transfer = await validateTransfer(connection, transaction, allowedTokens)
 
-    /*
+  /*
        An attacker could make multiple signing requests before the transaction is confirmed. If the source token account
        has the minimum fee balance, validation and simulation of all these requests may succeed. All but the first
        confirmed transaction will fail because the account will be empty afterward. To prevent this race condition,
        simulation abuse, or similar attacks, we implement a simple lockout for the source token account
        for a few seconds after the transaction.
      */
-    key = `transfer/lastSignature/${transfer.keys.source.pubkey.toBase58()}`;
-    const lastSignature: number | undefined = await cache.get(key);
-    if (lastSignature && Date.now() - lastSignature < sameSourceTimeout) {
-        throw new Error('duplicate transfer');
-    }
-    await cache.set(key, Date.now());
+  key = `transfer/lastSignature/${transfer.keys.source.pubkey.toBase58()}`
+  const lastSignature: number | undefined | null = await cache.get(key)
+  if (lastSignature && Date.now() - lastSignature < sameSourceTimeout) {
+    throw new Error('duplicate transfer')
+  }
+  await cache.set(key, Date.now())
 
-    await simulateRawTransaction(connection, rawTransaction);
+  await simulateRawTransaction(connection, rawTransaction)
 
-    return { signature: signature };
+  return { signature: signature }
 }

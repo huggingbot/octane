@@ -1,1 +1,1 @@
-export * as whirlpools from './whirlpools';
+export * as whirlpools from './whirlpools'

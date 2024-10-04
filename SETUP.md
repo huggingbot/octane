@@ -57,6 +57,7 @@ The values containing `__PLACEHOLDER__` need to be changed.
 Let's start by creating a keypair and minting a token to test with.
 
 From the command line, run these commands:
+
 ```shell
 solana-keygen new --no-bip39-passphrase --silent --outfile keys/octane.json
 
@@ -77,6 +78,7 @@ These `__PLACEHOLDER__` values must also change.
 - `account` is the base58 encoded public key of an SPL token account corresponding to this mint.
 
 From the command line, run these commands:
+
 ```shell
 solana airdrop 1
 
@@ -84,6 +86,7 @@ spl-token create-token
 ```
 
 After the last command, you should see:
+
 ```
 Creating token <base58 encoded TRANSFER_MINT public key>
 ```
@@ -91,6 +94,7 @@ Creating token <base58 encoded TRANSFER_MINT public key>
 Copy this **TRANSFER_MINT** public key, update the value of `TRANSFER_MINT` in your `config.json` file with it, and save the file.
 
 From the command line, run these commands:
+
 ```shell
 source .env
 
@@ -100,6 +104,7 @@ spl-token mint $TRANSFER_MINT 100
 ```
 
 After the last command, you should see:
+
 ```
 Minting 100 tokens
   Token: <base58 encoded TRANSFER_MINT public key>
@@ -138,7 +143,7 @@ You should see:
 
 Edit the **Root Directory** section to `./packages/server`
 
-Expand the *Build and Output Settings* section.
+Expand the _Build and Output Settings_ section.
 
 Under **Build Command**, toggle the slider for **Override** and put `cd ../.. && yarn build`.
 

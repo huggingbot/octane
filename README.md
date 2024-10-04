@@ -20,11 +20,11 @@ Octane provides an API that lets users pay for transactions with SPL token trans
 
 It leverages unique properties of Solana:
 
-1) Transaction can have multiple signers, one of whom is the transaction fee payer. There is no single "msg.sender".
+1. Transaction can have multiple signers, one of whom is the transaction fee payer. There is no single "msg.sender".
 
-2) Transaction can have multiple instructions interacting with different programs that are executed atomically. If one instruction fail, whole transactions fails.
+2. Transaction can have multiple instructions interacting with different programs that are executed atomically. If one instruction fail, whole transactions fails.
 
-3) Each instruction refers to accounts it touches as writable or readable. It allows to validate transactions before signing.
+3. Each instruction refers to accounts it touches as writable or readable. It allows to validate transactions before signing.
 
 A user creates a transaction that contains an instruction for a small token transfer to Octane, along with whatever else their transaction is supposed to do.
 
@@ -65,10 +65,11 @@ If you host your own Octane node, you'll need to manage fee payer account. Octan
 ### Example app
 
 [octane-demo](https://github.com/sevazhidkov/octane-demo) is an open source app that showcases various types of gasless transactions using Octane:
-* gasless token transfer (equivalent to any other simple transaction)
-* transaction sponsorship for authorized users, including limits and usage of octane-core
-* gasless swaps from tokens to SOL
-* just-in-time swaps to run Metaplex NFT mints and Anchor programs
+
+- gasless token transfer (equivalent to any other simple transaction)
+- transaction sponsorship for authorized users, including limits and usage of octane-core
+- gasless swaps from tokens to SOL
+- just-in-time swaps to run Metaplex NFT mints and Anchor programs
 
 ### Common integration scenarios
 
@@ -88,10 +89,11 @@ It uses ratelimiting, transaction validation, and transaction simulation to miti
 
 However, there are some risks associated with running an Octane node:
 
-1) Token-to-SOL price spread. Octane is configured to accept specific amounts of SPL tokens for paying fixed transaction fees in SOL. Since the token price relative to SOL can change, Octane could end up in a state where it loses money on every transaction.
-2) Draining possibilities due to Octane software bugs. Octane signs user-generated transactions with fee payer's keypair after confirming a transaction transfers fee and does not try to modify fee payer's accounts.  However, if implemented checks are insufficient due to a bug, an attacker could run transaction without paying the fee or modify fee payer's accounts.
+1. Token-to-SOL price spread. Octane is configured to accept specific amounts of SPL tokens for paying fixed transaction fees in SOL. Since the token price relative to SOL can change, Octane could end up in a state where it loses money on every transaction.
+2. Draining possibilities due to Octane software bugs. Octane signs user-generated transactions with fee payer's keypair after confirming a transaction transfers fee and does not try to modify fee payer's accounts. However, if implemented checks are insufficient due to a bug, an attacker could run transaction without paying the fee or modify fee payer's accounts.
 
 Follow these recommendations to minimize risks:
+
 1. Run Octane on a new separate keypair, not used in governance or within contracts as an authority.
 2. Set SPL token price for transactions with a premium relative to their real cost in SOL.
 3. Don't hold more SOL on the keypair than needed for 3-4 hours of spending on transaction fees for your load expectations. It could be as low as 0.2-1 SOL.
@@ -99,18 +101,19 @@ Follow these recommendations to minimize risks:
 5. Regularly check that prices and liquidity of SPL tokens allow your profitably pay for transaction fees in SOL.
 6. If your Octane node makes profit, regularly withdraw that profit to another keypair.
 7. When using Octane as a library in your backend, make sure to:
-    1. Never return fee payer's signature of an unconfirmed transaction to a user. You must submit transaction to the network from the backend.
-    2. Implement duplicated transaction checks, limits per user and general rate limits.
+   1. Never return fee payer's signature of an unconfirmed transaction to a user. You must submit transaction to the network from the backend.
+   2. Implement duplicated transaction checks, limits per user and general rate limits.
 
 ## Contributing
 
 Octane is a great way to start contributing in the Solana ecosystem. Since Octane is just an HTTP server written on Typescript, you don't have to know Rust or learn how to build programs on Solana.
 
 Some ideas for your first PRs:
-* More tests with various scenarios focused on Octane security
-* Docs, guides and example code for new people to get started with Octane
-* Add support for more exchange protocols
-* Build apps for consumers on top of Octane
+
+- More tests with various scenarios focused on Octane security
+- Docs, guides and example code for new people to get started with Octane
+- Add support for more exchange protocols
+- Build apps for consumers on top of Octane
 
 Also, you can run your own Octane node and promote it among developers.
 

@@ -1,14 +1,14 @@
-import { Connection, Keypair, Transaction } from '@solana/web3.js';
+import { Connection, Keypair, Transaction } from '@solana/web3.js'
+import base58 from 'bs58'
+import { SimpleCache } from 'core/cache'
 import {
-    TokenFee,
-    sha256,
-    simulateRawTransaction,
-    validateAccountInitializationInstructions,
-    validateTransaction,
-    validateTransfer,
-} from '../core';
-import { Cache } from 'cache-manager';
-import base58 from 'bs58';
+  TokenFee,
+  sha256,
+  simulateRawTransaction,
+  validateAccountInitializationInstructions,
+  validateTransaction,
+  validateTransfer,
+} from '../core'
 
 /**
  * Sign transaction by fee payer if the first instruction is a transfer of a fee to given account and the second instruction
@@ -26,43 +26,43 @@ import base58 from 'bs58';
  * @return {signature: string} Transaction signature by fee payer
  */
 export async function createAccountIfTokenFeePaid(
-    connection: Connection,
-    transaction: Transaction,
-    feePayer: Keypair,
-    maxSignatures: number,
-    lamportsPerSignature: number,
-    allowedTokens: TokenFee[],
-    cache: Cache,
-    sameSourceTimeout = 5000
+  connection: Connection,
+  transaction: Transaction,
+  feePayer: Keypair,
+  maxSignatures: number,
+  lamportsPerSignature: number,
+  allowedTokens: TokenFee[],
+  cache: SimpleCache,
+  sameSourceTimeout = 5000
 ) {
-    // Prevent simple duplicate transactions using a hash of the message
-    let key = `transaction/${base58.encode(sha256(transaction.serializeMessage()))}`;
-    if (await cache.get(key)) throw new Error('duplicate transaction');
-    await cache.set(key, true);
+  // Prevent simple duplicate transactions using a hash of the message
+  let key = `transaction/${base58.encode(sha256(transaction.serializeMessage()))}`
+  if (await cache.get(key)) throw new Error('duplicate transaction')
+  await cache.set(key, true)
 
-    // Check that the transaction is basically valid, sign it, and serialize it, verifying the signatures
-    const { signature, rawTransaction } = await validateTransaction(
-        connection,
-        transaction,
-        feePayer,
-        maxSignatures,
-        lamportsPerSignature
-    );
+  // Check that the transaction is basically valid, sign it, and serialize it, verifying the signatures
+  const { signature, rawTransaction } = await validateTransaction(
+    connection,
+    transaction,
+    feePayer,
+    maxSignatures,
+    lamportsPerSignature
+  )
 
-    // Check that transaction only contains transfer and a valid new account
-    await validateAccountInitializationInstructions(connection, transaction, feePayer, cache);
+  // Check that transaction only contains transfer and a valid new account
+  await validateAccountInitializationInstructions(connection, transaction, feePayer, cache)
 
-    // Check that the transaction contains a valid transfer to Octane's token account
-    const transfer = await validateTransfer(connection, transaction, allowedTokens);
+  // Check that the transaction contains a valid transfer to Octane's token account
+  const transfer = await validateTransfer(connection, transaction, allowedTokens)
 
-    key = `createAccount/lastSignature/${transfer.keys.source.pubkey.toBase58()}`;
-    const lastSignature: number | undefined = await cache.get(key);
-    if (lastSignature && Date.now() - lastSignature < sameSourceTimeout) {
-        throw new Error('duplicate transfer');
-    }
-    await cache.set(key, Date.now());
+  key = `createAccount/lastSignature/${transfer.keys.source.pubkey.toBase58()}`
+  const lastSignature: number | undefined | null = await cache.get(key)
+  if (lastSignature && Date.now() - lastSignature < sameSourceTimeout) {
+    throw new Error('duplicate transfer')
+  }
+  await cache.set(key, Date.now())
 
-    await simulateRawTransaction(connection, rawTransaction);
+  await simulateRawTransaction(connection, rawTransaction)
 
-    return { signature: signature };
+  return { signature: signature }
 }

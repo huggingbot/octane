@@ -1,13 +1,9 @@
-import base58 from 'bs58';
-import nacl from 'tweetnacl';
-import { Keypair, Message, PublicKey } from '@solana/web3.js';
+import base58 from 'bs58'
+import nacl from 'tweetnacl'
+import { Keypair, Message, PublicKey } from '@solana/web3.js'
 
 function bufferToSign(key: string, serializedMessage: Buffer): Buffer {
-    return Buffer.concat([
-        Buffer.from('octane-message-token', 'utf-8'),
-        Buffer.from(key),
-        serializedMessage
-    ]);
+  return Buffer.concat([Buffer.from('octane-message-token', 'utf-8'), Buffer.from(key), serializedMessage])
 }
 
 /**
@@ -16,28 +12,28 @@ function bufferToSign(key: string, serializedMessage: Buffer): Buffer {
  * by an untrusted source.
  */
 export class MessageToken {
-    key: string; // identifies what kind of transaction within octane is this token for. for example, "whirlpools-swap".
-    message: Message;
-    keypair: Keypair;
+  key: string // identifies what kind of transaction within octane is this token for. for example, "whirlpools-swap".
+  message: Message
+  keypair: Keypair
 
-    constructor(key: string, message: Message, keypair: Keypair) {
-        this.key = key;
-        this.message = message;
-        this.keypair = keypair;
-    }
+  constructor(key: string, message: Message, keypair: Keypair) {
+    this.key = key
+    this.message = message
+    this.keypair = keypair
+  }
 
-    compile(): string {
-        const buffer = bufferToSign(this.key, this.message.serialize());
-        const signature = nacl.sign.detached(buffer, this.keypair.secretKey);
-        return base58.encode(signature);
-    }
+  compile(): string {
+    const buffer = bufferToSign(this.key, this.message.serialize())
+    const signature = nacl.sign.detached(buffer, this.keypair.secretKey)
+    return base58.encode(signature)
+  }
 
-    static isValid(key: string, message: Message, token: string, publicKey: PublicKey): boolean {
-        if (!token) {
-            return false;
-        }
-        const buffer = bufferToSign(key, message.serialize());
-        const signature = base58.decode(token);
-        return nacl.sign.detached.verify(buffer, signature, publicKey.toBuffer());
+  static isValid(key: string, message: Message, token: string, publicKey: PublicKey): boolean {
+    if (!token) {
+      return false
     }
+    const buffer = bufferToSign(key, message.serialize())
+    const signature = base58.decode(token)
+    return nacl.sign.detached.verify(buffer, signature, publicKey.toBuffer())
+  }
 }
