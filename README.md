@@ -151,7 +151,7 @@ Octane includes a demo application that showcases its functionality. This demo a
 
 1. Make sure you have set up your Octane node following the instructions in the [Setting up your own node](#setting-up-your-own-node) section.
 
-2. Navigate to the demo page in your browser (localhost:3000/demo).
+2. Navigate to the demo page in your browser (/demo).
 
 3. The demo page displays the following sections:
    - **Address Information**: Shows the addresses involved in the demo, including source and target owners, token accounts, and Octane-related addresses.
