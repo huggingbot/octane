@@ -142,3 +142,36 @@ Octane wants to be customizable for decentralized applications that want to spon
 Octane wants to create a seamless, competitive marketplace for gasless transactions.
 
 Octane wants to be secure, well-tested, well-documented, and easy to use.
+
+## Demo
+
+Octane includes a demo application that showcases its functionality. This demo allows you to interact with Octane and see how it handles token transfers and associated token account creation.
+
+### Running the Demo
+
+1. Make sure you have set up your Octane node following the instructions in the [Setting up your own node](#setting-up-your-own-node) section.
+
+2. Navigate to the demo page in your browser (localhost:3000/demo).
+
+3. The demo page displays the following sections:
+   - **Address Information**: Shows the addresses involved in the demo, including source and target owners, token accounts, and Octane-related addresses.
+   - **Actions**: Buttons to interact with the demo.
+   - **Output**: Displays the results of your actions.
+
+### Interacting with the Demo
+
+1. **Get or Create Target Token Account**:
+
+   - Click this button to either retrieve the existing associated token account for the target owner or create a new one if it doesn't exist.
+   - This action demonstrates how Octane handles associated token account creation fees.
+
+2. **Make Transfer**:
+
+   - After creating the target token account, click this button to initiate a token transfer.
+   - This action shows how Octane processes a token transfer, including paying the transaction fee with tokens instead of SOL.
+
+3. **Observe the Results**:
+   - Watch the "Address Information" section update as you perform actions.
+   - Check the "Output" section for detailed information about each transaction, including signatures and account addresses.
+
+This demo provides a hands-on way to understand how Octane works and how it can be integrated into your applications to enable gasless transactions on Solana.

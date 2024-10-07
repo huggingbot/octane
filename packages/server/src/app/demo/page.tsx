@@ -29,6 +29,7 @@ function App() {
   const [octaneFeePayer, setOctaneFeePayer] = useState<PublicKey | null>(null)
   const [octaneFee, setOctaneFee] = useState<number | null>(null)
   const [targetTokenAccount, setTargetTokenAccount] = useState<PublicKey | null>(null)
+  const [addressInfo, setAddressInfo] = useState<string>('')
 
   const fetchConfig = async () => {
     try {
@@ -56,6 +57,10 @@ function App() {
     }
     setup()
   }, [])
+
+  useEffect(() => {
+    updateAddressInfo()
+  }, [octaneTokenMint, octaneTokenAccount, octaneFeePayer, octaneFee, targetTokenAccount])
 
   const checkIfTokenAccountExists = async (tokenMint: PublicKey, owner: PublicKey) => {
     const tokenAccount = await getAssociatedTokenAddress(tokenMint, owner)
@@ -111,6 +116,20 @@ function App() {
     setOutput(JSON.stringify(res.data, null, 2))
   }
 
+  const updateAddressInfo = () => {
+    const info = `
+Source Owner: ${sourceOwner.publicKey.toBase58()}
+Source Token Account: ${sourceTokenAccount.toBase58()}
+Target Owner: ${targetOwner.publicKey.toBase58()}
+Target Token Account: ${targetTokenAccount ? targetTokenAccount.toBase58() : 'Not created yet'}
+Octane Token Mint: ${octaneTokenMint ? octaneTokenMint.toBase58() : 'Not loaded'}
+Octane Token Account: ${octaneTokenAccount ? octaneTokenAccount.toBase58() : 'Not loaded'}
+Octane Fee Payer: ${octaneFeePayer ? octaneFeePayer.toBase58() : 'Not loaded'}
+Octane Fee: ${octaneFee !== null ? octaneFee : 'Not loaded'}
+    `.trim()
+    setAddressInfo(info)
+  }
+
   return (
     <div className="App">
       <header>
@@ -120,6 +139,10 @@ function App() {
         <section className="actions">
           <button onClick={getOrCreateTokenAccount}>Get or Create Target Token Account</button>
           <button onClick={handleTransfer}>Make Transfer</button>
+        </section>
+        <section className="address-info">
+          <h2>Address Information</h2>
+          <pre>{addressInfo}</pre>
         </section>
         <section className="output">
           <h2>Output</h2>
